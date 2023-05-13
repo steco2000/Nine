@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Nine</string>
+    <string name="generate_seq">Generate sequence</string>
+    <string name="unguessed_letter">\?</string>
+    <string name="unknown_distance">\?????????</string>
+    <string name="restart">Restart</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="guessed_distance">!</string>
+    <string name="warning">Warning!</string>
+    <string name="missing_symbols">Some symbols in your sequence are missing!</string>
+    <string name="ok">OK</string>
+    <string name="sequence_guessed">000000000</string>
+    <string name="elapsed_time">Elapsed time:</string>
+    <string name="attempts">Attempts:</string>
+    <string name="timer_not_started">00:00.00</string>
+    <string name="seq_chronology">Previously confirmed sequences</string>
+</resources>
