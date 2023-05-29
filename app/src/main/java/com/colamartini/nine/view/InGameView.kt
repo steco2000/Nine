@@ -1,6 +1,7 @@
 package com.colamartini.nine.view
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.colamartini.nine.R
 import com.colamartini.nine.control.NineController
 import com.colamartini.nine.control.toZeroTrailedString
+import com.colamartini.nine.navigation.Screen
 import com.colamartini.nine.ui.theme.*
 import com.colamartini.nine.widgets.*
 import kotlinx.coroutines.delay
@@ -28,7 +31,7 @@ val controller = NineController()
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun InGameView() {
+fun InGameView(difficulty: Int, navController: NavController) {
 
     var sequence by rememberSaveable {
         mutableStateOf("")
@@ -45,7 +48,7 @@ fun InGameView() {
     var distance by rememberSaveable {
         mutableStateOf("")
     }
-    var liveInput by rememberSaveable {
+    val liveInput by rememberSaveable {
         mutableStateOf(CharArray(9))
     }
     var charsExtracted by rememberSaveable {
@@ -81,18 +84,57 @@ fun InGameView() {
     var centSeconds: Long by rememberSaveable {
         mutableStateOf(0)
     }
-    var sequenceIsGuessed by rememberSaveable {
-        mutableStateOf(false)
-    }
     var previousInputSequences by rememberSaveable {
         mutableStateOf(listOf<String>())
     }
+    var backRequest by rememberSaveable {
+        mutableStateOf(false)
+    }
 
+    //all'avvio della sessione vengono inizializzate tutte le variabili necessarie
     if (!sessionStarted) {
         sequence = controller.refreshSequence()
         charsExtracted = sequence.toCharArray()
         charsExtracted.shuffle()
         sessionStarted = true
+        controller.setGameDifficulty(difficulty)
+    }
+
+    //Gestione della pressione del tasto back. Viene chiesto all'utente se è sicuro di uscire dalla sessione di gioco
+    BackHandler(enabled = true, onBack = {
+        backRequest = true
+    })
+    if(backRequest){
+        QuestionAlertDialog(title = stringResource(id = R.string.warning), text = stringResource(id = R.string.quit_question),
+            onDismissRequest = { backRequest = false },
+            onAcceptRequest = { navController.navigate("menu_view") })
+    }
+
+
+    if (controller.gameIsLost()) {
+
+        //se la partita è persa si mostra un alert dialog che informa l'utente. Alla pressione del tasto ok si ricarica l'interfaccia
+        timerIsRunning = false
+        GeneralInfoAlertDialog(
+            title = stringResource(id = R.string.game_lost),
+            text = stringResource(id = R.string.game_lost_dialog_text)
+        ) {
+            navController.navigate(Screen.InGameView.withArgs("$difficulty"))
+        }
+    } else if (controller.isGuessed()) {
+
+        //todo: salvataggio risultati
+        //se la partita è vinta si fa la stessa cosa, mostrando anche i risultati
+        timerIsRunning = false
+        GeneralInfoAlertDialog(
+            title = stringResource(id = R.string.game_won_title),
+            text = stringResource(id = R.string.game_won_basic_text) + "\n"
+                    + "\n"
+                    + stringResource(R.string.time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(centSeconds / 10)+ "\n"
+                    + stringResource(R.string.total_attempts) + " " + attempts
+        ) {
+            navController.navigate(Screen.InGameView.withArgs("$difficulty"))
+        }
     }
 
     //colonna generale
@@ -105,25 +147,15 @@ fun InGameView() {
 
         //se alla ricomposizione c'è stato un tentativo di confermare una sequenza incompleta viene mostrato un messaggio di errore
         if (confirmationNotAllowed) {
-            AlertDialog(
-                backgroundColor = background,
-                onDismissRequest = { confirmationNotAllowed = false },
-                title = { Text(text = stringResource(R.string.warning), color = background_text) },
-                text = {
-                    Text(
-                        text = stringResource(R.string.missing_symbols),
-                        color = background_text
-                    )
-                },
-                confirmButton = {
-                    StyledButton(
-                        onClick = { confirmationNotAllowed = false },
-                        text = stringResource(R.string.ok)
-                    )
-                })
+            GeneralInfoAlertDialog(
+                title = stringResource(R.string.warning),
+                text = stringResource(R.string.missing_symbols)
+            ) {
+                confirmationNotAllowed = false
+            }
         }
 
-        //logo e info
+        //definizione logo, info partita (tempo e tentativi) e tasto restart
         Row(
             modifier = Modifier
                 .padding(generalPadding)
@@ -132,7 +164,7 @@ fun InGameView() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            LogoView()
+            LogoView(internalLogoSize)
             Column(
                 modifier = Modifier
                     .padding(cornerDpShape)
@@ -143,26 +175,16 @@ fun InGameView() {
             ) {
                 StyledButton(
                     onClick = {
-                        sequence = controller.refreshSequence()
-                        charsExtracted = sequence.toCharArray()
-                        charsExtracted.shuffle()
-                        guessedIndexes = listOf()
-                        guessedChars = CharArray(9)
-                        distance = "?????????"
-                        liveInput = CharArray(9)
-                        userInput = ""
-                        attempts = 0
-                        timerIsRunning = false
-                        startTime = 0
-                        elapsedTime = 0
-                        sequenceIsGuessed = false
-                        previousInputSequences = listOf()
-                        selectedInputCell = 0
+                        //alla pressione del tasto restart si ricarica l'interfaccia di gioco con la stessa difficoltà
+                        navController.navigate(Screen.InGameView.withArgs("$difficulty"))
                     },
                     text = stringResource(id = R.string.restart)
                 )
 
-
+                /*
+                il timer funziona grazie a un launched effect (thread dedicato) che calcola istante per istante il tempo trascorso
+                in millisecondi. Il totale viene poi convertito nel formato MM:SS.CC e mostrato all'utente
+                 */
                 LaunchedEffect(attempts >= 1) {
                     while (timerIsRunning) {
                         elapsedTime = System.currentTimeMillis() - startTime
@@ -177,11 +199,8 @@ fun InGameView() {
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.elapsed_time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(
-                        centSeconds / 10
-                    ), color = background_text
+                    text = stringResource(id = R.string.elapsed_time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(centSeconds / 10), color = background_text
                 )
-
 
                 Text(
                     text = stringResource(R.string.attempts) + " " + attempts,
@@ -196,20 +215,26 @@ fun InGameView() {
         DistanceBar(text = (if (userInput.isNotEmpty()) distance else stringResource(R.string.unknown_distance)))
         InputBar(sequence = userInput, hideIndexes = guessedIndexes, blurred = false)
 
-        LazyColumn(modifier = Modifier
-            .padding(generalPadding)
-            .weight(fullWeight)
-            .fillMaxWidth()
-            .border(borderSize, cells_background)
-            .background(background)
+        //la cronologia delle sequenze inserite dall'utente viene mostrata in una lazycolumn
+        LazyColumn(
+            modifier = Modifier
+                .padding(generalPadding)
+                .weight(fullWeight)
+                .fillMaxWidth()
+                .border(borderSize, cells_background)
+                .background(background)
         ) {
 
-            item{
-                Text(text = " " + stringResource(R.string.seq_chronology), color = background_text, modifier = Modifier.padding(generalPadding))
+            item {
+                Text(
+                    text = " " + stringResource(R.string.seq_chronology),
+                    color = background_text,
+                    modifier = Modifier.padding(generalPadding)
+                )
             }
 
-            previousInputSequences.forEach{
-                item{
+            previousInputSequences.forEach {
+                item {
                     InputBar(sequence = it, hideIndexes = listOf(), blurred = true)
                 }
             }
@@ -227,8 +252,17 @@ fun InGameView() {
         ) {
             for (i in 0..8) {
                 if (guessedIndexes.contains(i)) {
+                    /*
+                    se l'indice a cui fa riferimento questa casella corrisponde a un simbolo indovinato si sostituisce la casella con
+                    uno spacer di dimensione tale da coprire l'intera grandezza (padding compreso)
+                    */
                     Spacer(modifier = Modifier.size(hideIndexSpacerSize))
                 } else {
+                    /*
+                    ogni casella dell'input è un box cliccabile. Si mantiene l'indice della casella selezionata, che viene aggiornato
+                    in base al click del relativo box. Tutti i simboli inseriti dall'utente sono salvati in un CharArray (liveInput)
+                    e il box conterrà il simbolo relativo al proprio indice
+                     */
                     Box(
                         modifier = Modifier
                             .padding(generalPadding)
@@ -262,6 +296,11 @@ fun InGameView() {
         ) {
             for (i in 0..8) {
                 if (!liveInput.contains(charsExtracted[i]) && !guessedChars.contains(charsExtracted[i])) {
+
+                    /*
+                    In questo caso si mostra la casella del simbolo solo se questo non è stato ancora inserito (non in liveInput)
+                    e se il carattere non è stato ancora indovinato
+                     */
                     Box(
                         modifier = Modifier
                             .padding(generalPadding)
@@ -269,6 +308,11 @@ fun InGameView() {
                             .border(borderSize, black, RoundedCornerShape(cornerDpShape))
                             .background(cells_background, RoundedCornerShape(cornerDpShape))
                             .clickable {
+
+                                /*
+                                al click, la casella deve sparire e il simbolo che conteneva deve essere inserito nella casella selezionata
+                                nella barra dell'input
+                                 */
                                 liveInput[selectedInputCell] = charsExtracted[i]
 
                                 //si sposta il focus alla prima casella che non corrisponde ad un indice di un simbolo indovinato
@@ -290,9 +334,10 @@ fun InGameView() {
                                 */
                                 if (selectedInputCell == 8 && liveInput.indexOf('\u0000') != -1 && liveInput[selectedInputCell] != '\u0000') {
                                     selectedInputCell = liveInput.indexOf('\u0000')
-                                }
-                                else if (selectedInputCell == 8 && liveInput.indexOf('\u0000') == -1){
-                                    selectedInputCell = liveInput.indexOfFirst { icon -> !guessedIndexes.contains(sequence.indexOf(icon)) }
+                                } else if (selectedInputCell == 8 && liveInput.indexOf('\u0000') == -1) {
+                                    selectedInputCell = liveInput.indexOfFirst { icon ->
+                                        !guessedIndexes.contains(sequence.indexOf(icon))
+                                    }
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -300,6 +345,7 @@ fun InGameView() {
                         Text(charsExtracted[i].toString(), color = black)
                     }
                 } else {
+                    //se il simbolo è stato inserito o il carattere è già stato indovinato si sostituisce la casella con uno spacer
                     Spacer(modifier = Modifier.size(hideIndexSpacerSize))
                 }
             }
@@ -320,10 +366,18 @@ fun InGameView() {
                 onClick = {
                     if (liveInput.isNotEmpty()) {
                         if (liveInput[selectedInputCell] != '\u0000') {
+                            /*
+                            se il tasto "cancel" viene premuto quando il focus si trova su una casella dell'input piena, si svuota
+                            la casella e si mantiene il focus su di essa (forzando la ricomposizione sommando e sottraendo 1 al focus)
+                             */
                             liveInput[selectedInputCell] = '\u0000'
                             selectedInputCell += 1
                             selectedInputCell -= 1
                         } else {
+                            /*
+                            se invece la casella in cui si trova il focus è piena, si sposta il focus alla prima casella corrispondente
+                            a un simbolo non ancora indovinato, procedendo dunque a svuotarla
+                             */
                             val myIndex = selectedInputCell
                             for (i in myIndex - 1 downTo 0) {
                                 if (!guessedIndexes.contains(i)) {
@@ -340,20 +394,21 @@ fun InGameView() {
 
             StyledButton(
                 onClick = {
-                    if(sequenceIsGuessed) return@StyledButton
-
-                    var guessedCount = 0
+                    if (controller.isGuessed()) return@StyledButton //pulsante disabilitato se la sequenza è indovinata
 
                     if (liveInput.contains('\u0000')) {
+                        //se mancano dei caratteri si mostra il messaggio di errore
                         confirmationNotAllowed = true
                     } else {
+                        //todo: continua i commenti da qui
                         attempts += 1
                         if (attempts == 1) {
                             startTime = System.currentTimeMillis()
                             timerIsRunning = true
                         }
 
-                        if(attempts >= 2) previousInputSequences = previousInputSequences.plus(userInput)
+                        if (attempts >= 2) previousInputSequences =
+                            previousInputSequences.plus(userInput)
 
                         userInput = ""
                         distance = ""
@@ -367,22 +422,17 @@ fun InGameView() {
                             if (c.digitToInt() == 0) {
                                 guessedIndexes = guessedIndexes.plus(index)
                                 guessedChars = guessedChars.plus(sequence[index])
-                                guessedCount++
                             }
                         }
 
-                        if (guessedCount == 9) {
-                            sequenceIsGuessed = true
-                            timerIsRunning = false
-                        } else {
-                            //focus sulla prima casella relativa a un simbolo non ancora indovinato
-                            selectedInputCell =
-                                liveInput.indexOfFirst { !guessedChars.contains(it) }.or(0)
+                        //focus sulla prima casella relativa a un simbolo non ancora indovinato
+                        selectedInputCell =
+                            liveInput.indexOfFirst { !guessedChars.contains(it) }.or(0)
 
-                            //la barra dell'input viene svuotata negli indici dei simboli da indovinare
-                            liveInput.forEachIndexed { index, c ->
-                                if (!guessedChars.contains(c)) liveInput[index] = '\u0000'
-                            }
+                        //la barra dell'input viene svuotata negli indici dei simboli da indovinare
+                        liveInput.forEachIndexed { index, c ->
+                            if (!guessedChars.contains(c)) liveInput[index] = '\u0000'
+
                         }
 
                     }

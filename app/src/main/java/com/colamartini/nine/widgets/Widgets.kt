@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -15,20 +16,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.colamartini.nine.R
 import com.colamartini.nine.ui.theme.*
 
 @Composable
 fun InputBar(sequence: String, hideIndexes: List<Int>, blurred: Boolean) {
-    Row (
+    Row(
         modifier = Modifier
             .padding(generalPadding)
             .fillMaxWidth()
-            .alpha(if(blurred) halfWeight else fullWeight),
+            .alpha(if (blurred) halfWeight else fullWeight),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         val text: String = sequence.ifEmpty {
             stringResource(id = R.string.unknown_distance)
         }
@@ -39,7 +41,7 @@ fun InputBar(sequence: String, hideIndexes: List<Int>, blurred: Boolean) {
                 Box(
                     modifier = Modifier
                         .padding(generalPadding)
-                        .size(cellSize)
+                        .size(if (blurred) blurredCellSize else cellSize)
                         .border(borderSize, black, RoundedCornerShape(cornerDpShape))
                         .background(cells_background, RoundedCornerShape(cornerDpShape)),
                     contentAlignment = Alignment.Center
@@ -56,13 +58,13 @@ fun InputBar(sequence: String, hideIndexes: List<Int>, blurred: Boolean) {
 fun SequenceBar(text: String, guessedIndexes: List<Int>) {
     var borderColor: Color
 
-    Row (
+    Row(
         modifier = Modifier
             .padding(generalPadding)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         text.forEachIndexed { i, char ->
             borderColor = if (guessedIndexes.contains(i)) ok_cell else no_cell
             Box(
@@ -73,7 +75,10 @@ fun SequenceBar(text: String, guessedIndexes: List<Int>) {
                     .background(cells_background, RoundedCornerShape(cornerDpShape)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(if(guessedIndexes.contains(i)) char.toString() else stringResource(R.string.unguessed_letter), color = black)
+                Text(
+                    if (guessedIndexes.contains(i)) char.toString() else stringResource(R.string.unguessed_letter),
+                    color = black
+                )
             }
         }
     }
@@ -88,7 +93,7 @@ fun DistanceBar(text: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        text.forEach {char ->
+        text.forEach { char ->
             Box(
                 modifier = Modifier
                     .padding(generalPadding)
@@ -104,21 +109,22 @@ fun DistanceBar(text: String) {
 }
 
 @Composable
-fun LogoView(){
+fun LogoView(size: Dp, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(id = R.drawable.logo),
         contentDescription = "",
-        modifier = Modifier
-            //.size(150.dp)
-            .size(100.dp)
+        modifier = modifier
+            .size(size)
     )
 }
 
 @Composable
-fun StyledButton(onClick: () -> Unit, text: String){
+fun StyledButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
     Button(
-        modifier = Modifier
-            .padding(generalPadding),
+        modifier = modifier
+            .padding(generalPadding)
+            .width(100.dp)
+            .height(40.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = cells_background
         ),
@@ -126,4 +132,59 @@ fun StyledButton(onClick: () -> Unit, text: String){
     ) {
         Text(text = text, color = black)
     }
+}
+
+@Composable
+fun GeneralInfoAlertDialog(title: String, text: String, onDismissRequest: () -> Unit) {
+    AlertDialog(
+        backgroundColor = background,
+        onDismissRequest = { onDismissRequest() },
+        title = { Text(text = title, color = background_text) },
+        text = {
+            Text(
+                text = text,
+                color = background_text
+            )
+        },
+        confirmButton = {
+            StyledButton(
+                onClick = { onDismissRequest() },
+                text = stringResource(R.string.ok)
+            )
+        })
+}
+
+@Composable
+fun QuestionAlertDialog(
+    title: String,
+    text: String,
+    onDismissRequest: () -> Unit,
+    onAcceptRequest: () -> Unit
+) {
+    AlertDialog(
+        backgroundColor = background,
+        onDismissRequest = { onDismissRequest() },
+        title = { Text(text = title, color = background_text) },
+        text = {
+            Text(
+                text = text,
+                color = background_text
+            )
+        },
+        confirmButton = {
+            StyledButton(
+                onClick = {
+                    onAcceptRequest()
+                },
+                text = stringResource(R.string.yes)
+            )
+        },
+        dismissButton = {
+            StyledButton(
+                onClick = {
+                    onDismissRequest()
+                },
+                text = stringResource(R.string.no)
+            )
+        })
 }

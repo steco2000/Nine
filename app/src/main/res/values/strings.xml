@@ -15,4 +15,19 @@
     <string name="attempts">Attempts:</string>
     <string name="timer_not_started">00:00.00</string>
     <string name="seq_chronology">Previously confirmed sequences</string>
+    <string name="play">Play</string>
+    <string name="scores">Scores</string>
+    <string name="select_difficulty">Select difficulty</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="game_lost">You Lost!</string>
+    <string name="game_lost_dialog_text">Your attempts are over!</string>
+    <string name="game_won_title">You Won!</string>
+    <string name="game_won_basic_text">Congratulations, you have guessed the sequence!</string>
+    <string name="time">Time:</string>
+    <string name="total_attempts">Total attempts:</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="quit_question">Your game is on, are you sure you want to quit?</string>
 </resources>
