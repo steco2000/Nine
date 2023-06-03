@@ -36,7 +36,6 @@ class NineController {
         var absDistance: Int
 
         attempts++
-        gameLost = attempts >= maxAttempts && !sequenceIsGuessed
 
         userInput.forEachIndexed {idxIn ,inChar ->
             sequence.forEachIndexed{ i, seqChar ->
@@ -52,6 +51,7 @@ class NineController {
         }
 
         if(distance == "000000000") sequenceIsGuessed = true
+        gameLost = attempts >= maxAttempts && !sequenceIsGuessed
 
         return distance
     }

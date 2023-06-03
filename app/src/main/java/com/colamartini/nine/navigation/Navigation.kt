@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.colamartini.nine.view.DifficultyView
 import com.colamartini.nine.view.InGameView
 import com.colamartini.nine.view.MenuView
+import com.colamartini.nine.view.ScoresView
 
 @Composable
 fun Navigation(){
@@ -30,6 +31,9 @@ fun Navigation(){
             )
         ){ entry ->
             InGameView(difficulty = entry.arguments!!.getInt("difficulty"), navController)
+        }
+        composable(route = Screen.ScoresView.route){
+            ScoresView(navController)
         }
     }
 }

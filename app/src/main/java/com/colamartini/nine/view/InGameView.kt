@@ -15,10 +15,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.colamartini.nine.R
+import com.colamartini.nine.beans.GameBean
+import com.colamartini.nine.control.GamePersistenceController
 import com.colamartini.nine.control.NineController
 import com.colamartini.nine.control.toZeroTrailedString
 import com.colamartini.nine.navigation.Screen
@@ -28,10 +31,15 @@ import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 val controller = NineController()
+var dbController: GamePersistenceController? = null
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun InGameView(difficulty: Int, navController: NavController) {
+
+    if (dbController == null) {
+        dbController = GamePersistenceController(LocalContext.current)
+    }
 
     var sequence by rememberSaveable {
         mutableStateOf("")
@@ -90,6 +98,9 @@ fun InGameView(difficulty: Int, navController: NavController) {
     var backRequest by rememberSaveable {
         mutableStateOf(false)
     }
+    var gameSaved by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     //all'avvio della sessione vengono inizializzate tutte le variabili necessarie
     if (!sessionStarted) {
@@ -104,14 +115,27 @@ fun InGameView(difficulty: Int, navController: NavController) {
     BackHandler(enabled = true, onBack = {
         backRequest = true
     })
-    if(backRequest){
-        QuestionAlertDialog(title = stringResource(id = R.string.warning), text = stringResource(id = R.string.quit_question),
+    if (backRequest) {
+        QuestionAlertDialog(title = stringResource(id = R.string.warning),
+            text = stringResource(id = R.string.quit_question),
             onDismissRequest = { backRequest = false },
             onAcceptRequest = { navController.navigate("menu_view") })
     }
 
 
     if (controller.gameIsLost()) {
+
+        if (!gameSaved) {
+            dbController!!.saveGame(
+                GameBean(
+                    difficulty = difficulty,
+                    attempts = attempts,
+                    time = elapsedTime,
+                    win = false
+                )
+            )
+            gameSaved = true
+        }
 
         //se la partita è persa si mostra un alert dialog che informa l'utente. Alla pressione del tasto ok si ricarica l'interfaccia
         timerIsRunning = false
@@ -121,7 +145,20 @@ fun InGameView(difficulty: Int, navController: NavController) {
         ) {
             navController.navigate(Screen.InGameView.withArgs("$difficulty"))
         }
+
     } else if (controller.isGuessed()) {
+
+        if (!gameSaved) {
+            dbController!!.saveGame(
+                GameBean(
+                    difficulty = difficulty,
+                    attempts = attempts,
+                    time = elapsedTime,
+                    win = true
+                )
+            )
+            gameSaved = true
+        }
 
         //todo: salvataggio risultati
         //se la partita è vinta si fa la stessa cosa, mostrando anche i risultati
@@ -130,7 +167,9 @@ fun InGameView(difficulty: Int, navController: NavController) {
             title = stringResource(id = R.string.game_won_title),
             text = stringResource(id = R.string.game_won_basic_text) + "\n"
                     + "\n"
-                    + stringResource(R.string.time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(centSeconds / 10)+ "\n"
+                    + stringResource(R.string.time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(
+                centSeconds / 10
+            ) + "\n"
                     + stringResource(R.string.total_attempts) + " " + attempts
         ) {
             navController.navigate(Screen.InGameView.withArgs("$difficulty"))
@@ -199,7 +238,9 @@ fun InGameView(difficulty: Int, navController: NavController) {
                     )
                 )
                 Text(
-                    text = stringResource(id = R.string.elapsed_time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(centSeconds / 10), color = background_text
+                    text = stringResource(id = R.string.elapsed_time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(
+                        centSeconds / 10
+                    ), color = background_text
                 )
 
                 Text(

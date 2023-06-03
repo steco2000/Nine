@@ -4,6 +4,7 @@ sealed class Screen(val route: String){
     object MenuView : Screen("menu_view")
     object DifficultyView : Screen("difficulty_view")
     object InGameView : Screen("in_game_view")
+    object ScoresView : Screen("scores_view")
 
     fun withArgs(vararg args: String): String{
         return buildString {

@@ -51,7 +51,7 @@ fun MenuView(navController: NavController){
 
         StyledButton(
             onClick = {
-                //todo: navigate to ScoresView
+                navController.navigate("scores_view")
             },
             text = stringResource(R.string.scores),
             modifier = Modifier
