@@ -1,16 +1,15 @@
 package com.colamartini.nine.view
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.colamartini.nine.R
+import com.colamartini.nine.navigation.Screen
 import com.colamartini.nine.ui.theme.*
 import com.colamartini.nine.widgets.LogoView
 import com.colamartini.nine.widgets.StyledButton
@@ -43,15 +42,17 @@ fun MenuView(navController: NavController){
             text = stringResource(R.string.play),
             modifier = Modifier
                 .constrainAs(play){
-                    top.linkTo(logo.bottom, margin = menuButtonLogoMargin)
+                    //top.linkTo(logo.bottom, margin = menuButtonLogoMargin)
+                    top.linkTo(parent.top)
                     start.linkTo(logo.start)
                     end.linkTo(logo.end)
+                    bottom.linkTo(parent.bottom)
                 }
         )
 
         StyledButton(
             onClick = {
-                navController.navigate("scores_view")
+                navController.navigate(Screen.ScoresView.withArgs("0"))
             },
             text = stringResource(R.string.scores),
             modifier = Modifier

@@ -27,6 +27,10 @@ class NineController {
         return String(chars.toCharArray())
     }
 
+    fun getMaxAttempts(): Int{
+        return maxAttempts
+    }
+
     fun isGuessed(): Boolean { return sequenceIsGuessed }
     fun gameIsLost(): Boolean { return gameLost }
 

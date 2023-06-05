@@ -32,8 +32,16 @@ fun Navigation(){
         ){ entry ->
             InGameView(difficulty = entry.arguments!!.getInt("difficulty"), navController)
         }
-        composable(route = Screen.ScoresView.route){
-            ScoresView(navController)
+        composable(
+            route = Screen.ScoresView.route + "/{difficulty}",
+            arguments = listOf(
+                navArgument("difficulty"){
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
+            )
+        ){ entry ->
+            ScoresView(navController, difficulty = entry.arguments!!.getInt("difficulty"))
         }
     }
 }

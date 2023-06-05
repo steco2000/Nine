@@ -11,9 +11,14 @@ interface GameDAO {
     @Insert
     fun insert(game: Game)
 
-    //todo riprendi da qui
-    @Query("select * from Game where time = (select Min(time) from Game where win = 1) and difficulty = 0")
+    @Query("select * from Game where time = (select Min(time) from Game where win = 1 and difficulty = 0) and difficulty = 0")
     fun getEasyBestTime(): Game?
+
+    @Query("select * from Game where time = (select Min(time) from Game where win = 1 and difficulty = 1) and difficulty = 1")
+    fun getMediumBestTime(): Game?
+
+    @Query("select * from Game where time = (select Min(time) from Game where win = 1 and difficulty = 2) and difficulty = 2")
+    fun getHardBestTime(): Game?
 
     @Query("select * from Game where difficulty = 0")
     fun getEasyGames(): List<Game>

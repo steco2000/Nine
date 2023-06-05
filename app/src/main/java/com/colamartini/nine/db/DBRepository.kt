@@ -17,8 +17,24 @@ class DBRepository(private val dao: GameDAO) {
         return dao.getEasyBestTime()
     }
 
+    fun getMediumBestTime(): Game? {
+        return dao.getMediumBestTime()
+    }
+
+    fun getHardBestTime(): Game? {
+        return dao.getHardBestTime()
+    }
+
     fun getAllEasyGames(): List<Game> {
         return dao.getEasyGames()
+    }
+
+    fun getAllMediumGames(): List<Game> {
+        return dao.getMediumGames()
+    }
+
+    fun getAllHardGames(): List<Game> {
+        return dao.getHardGames()
     }
 
 }

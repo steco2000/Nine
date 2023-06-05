@@ -160,7 +160,6 @@ fun InGameView(difficulty: Int, navController: NavController) {
             gameSaved = true
         }
 
-        //todo: salvataggio risultati
         //se la partita è vinta si fa la stessa cosa, mostrando anche i risultati
         timerIsRunning = false
         GeneralInfoAlertDialog(
@@ -244,14 +243,14 @@ fun InGameView(difficulty: Int, navController: NavController) {
                 )
 
                 Text(
-                    text = stringResource(R.string.attempts) + " " + attempts,
+                    text = stringResource(R.string.attempts) + " " + attempts + "/" + controller.getMaxAttempts(),
                     color = background_text
                 )
             }
 
         }
 
-        //sequenza nascosta + distanza
+        //sequenza nascosta + distanza + barra della sequenza appena inserita
         SequenceBar(sequence, guessedIndexes = guessedIndexes)
         DistanceBar(text = (if (userInput.isNotEmpty()) distance else stringResource(R.string.unknown_distance)))
         InputBar(sequence = userInput, hideIndexes = guessedIndexes, blurred = false)
@@ -416,7 +415,7 @@ fun InGameView(difficulty: Int, navController: NavController) {
                             selectedInputCell -= 1
                         } else {
                             /*
-                            se invece la casella in cui si trova il focus è piena, si sposta il focus alla prima casella corrispondente
+                            se invece la casella in cui si trova il focus è vuota, si sposta il focus alla prima casella corrispondente
                             a un simbolo non ancora indovinato, procedendo dunque a svuotarla
                              */
                             val myIndex = selectedInputCell
