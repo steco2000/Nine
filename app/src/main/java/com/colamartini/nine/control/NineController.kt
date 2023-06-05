@@ -3,10 +3,10 @@ package com.colamartini.nine.control
 class NineController {
 
     var difficulty: Int = 2
-    var attempts = 0
-    var sequenceIsGuessed = false
+    private var attempts = 0
+    private var sequenceIsGuessed = false
     private var maxAttempts = 2
-    var gameLost = false
+    private var gameLost = false
 
     companion object{
         const val symbols = "ღ•⁂€∞▲●☀☁☂☃★☆☐☎☢☣☮☯☸☼☽☾♚♛♜♝♞♟♨♩♪♫♬✈✉✿❀❁❄❦♣♦♥♠֍$♓♒♑♐♏♎♍♌♋♊♉♈0123456789QWERTYUIOPASDFGHJKLZXCVBNM"

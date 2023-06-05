@@ -18,14 +18,21 @@ import com.colamartini.nine.ui.theme.*
 import com.colamartini.nine.widgets.LogoView
 import com.colamartini.nine.widgets.StyledButton
 
+/*
+schermata di selezione della difficoltà. A ognuna delle tre difficoltà, facile, media e difficile, è associato un id, rispettivamente 0, 1 e 2. Quando la difficoltà è impostata su facile
+l'utente ha a disposizione 4 tentativi per indovinare la sequenza. Per la difficoltà media l'utente ha a disposizione 3 tentativi e invece, per difficile, ne ha a disposizione 2 (standard)
+ */
+
 @Composable
 fun DifficultyView(navController: NavController){
 
+    //alla pressione del tasto back si torna al menu
     BackHandler(enabled = true, onBack = { navController.navigate("menu_view") })
 
     ConstraintLayout(modifier = Modifier.fillMaxSize().padding(generalPadding)) {
         val(upbar, easyButton, mediumButton, hardButton) = createRefs()
 
+        //in base al tasto premuto si avvia la schermata di gioco comunicandole la difficoltà scelta
         Row (
             modifier = Modifier
                 .padding(generalPadding)

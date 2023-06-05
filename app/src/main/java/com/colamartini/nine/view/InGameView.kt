@@ -30,6 +30,8 @@ import com.colamartini.nine.widgets.*
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
+//schermata di gioco
+
 val controller = NineController()
 var dbController: GamePersistenceController? = null
 
@@ -102,29 +104,39 @@ fun InGameView(difficulty: Int, navController: NavController) {
         mutableStateOf(false)
     }
 
-    //all'avvio della sessione vengono inizializzate tutte le variabili necessarie
+    //all'avvio della sessione vengono inizializzate tutte le variabili necessarie e impostata la difficoltà al controller applicativo
     if (!sessionStarted) {
         sequence = controller.refreshSequence()
+
+        /*
+        al refresh della sequenza vengono estratti 9 simboli casuali dal set dell'app con cui viene generata la sequenza stessa.
+        I simboli vengono poi salvati in un array per essere mostrati all'utente dopo essere stati mescolati
+         */
         charsExtracted = sequence.toCharArray()
         charsExtracted.shuffle()
+
         sessionStarted = true
         controller.setGameDifficulty(difficulty)
     }
 
-    //Gestione della pressione del tasto back. Viene chiesto all'utente se è sicuro di uscire dalla sessione di gioco
+    //Gestione della pressione del tasto back. Se il timer è partito viene chiesto all'utente se è sicuro di uscire, altrimenti si torna al menu
     BackHandler(enabled = true, onBack = {
         backRequest = true
     })
-    if (backRequest) {
+    if (backRequest && timerIsRunning) {
         QuestionAlertDialog(title = stringResource(id = R.string.warning),
             text = stringResource(id = R.string.quit_question),
             onDismissRequest = { backRequest = false },
             onAcceptRequest = { navController.navigate("menu_view") })
+    }else if(backRequest){
+        navController.navigate("menu_view")
+        backRequest = false
     }
 
 
     if (controller.gameIsLost()) {
 
+        //se la partita è persa si mostra un alert dialog che informa l'utente. Alla pressione del tasto ok si ricarica l'interfaccia. Inoltre vengono salvate nel db le informazioni della partita
         if (!gameSaved) {
             dbController!!.saveGame(
                 GameBean(
@@ -137,7 +149,6 @@ fun InGameView(difficulty: Int, navController: NavController) {
             gameSaved = true
         }
 
-        //se la partita è persa si mostra un alert dialog che informa l'utente. Alla pressione del tasto ok si ricarica l'interfaccia
         timerIsRunning = false
         GeneralInfoAlertDialog(
             title = stringResource(id = R.string.game_lost),
@@ -148,6 +159,7 @@ fun InGameView(difficulty: Int, navController: NavController) {
 
     } else if (controller.isGuessed()) {
 
+        //se la partita è vinta si fa la stessa cosa, mostrando nell'alert dialog anche i risultati
         if (!gameSaved) {
             dbController!!.saveGame(
                 GameBean(
@@ -160,7 +172,6 @@ fun InGameView(difficulty: Int, navController: NavController) {
             gameSaved = true
         }
 
-        //se la partita è vinta si fa la stessa cosa, mostrando anche i risultati
         timerIsRunning = false
         GeneralInfoAlertDialog(
             title = stringResource(id = R.string.game_won_title),
@@ -440,16 +451,19 @@ fun InGameView(difficulty: Int, navController: NavController) {
                         //se mancano dei caratteri si mostra il messaggio di errore
                         confirmationNotAllowed = true
                     } else {
-                        //todo: continua i commenti da qui
                         attempts += 1
+
+                        //al primo tentativo parte il timer
                         if (attempts == 1) {
                             startTime = System.currentTimeMillis()
                             timerIsRunning = true
                         }
 
+                        //se sono già state inserite almeno due sequenze si comincia a mostrare le precedenti nella lazycolumn al centro della schermata
                         if (attempts >= 2) previousInputSequences =
                             previousInputSequences.plus(userInput)
 
+                        //si registra l'input definitivo e si calola la distanza
                         userInput = ""
                         distance = ""
                         liveInput.forEach {
@@ -458,6 +472,7 @@ fun InGameView(difficulty: Int, navController: NavController) {
 
                         distance = controller.calculateDistance(sequence, userInput)
 
+                        //si scorre la distanza alla ricerca di caratteri indovinati (per renderli visibili nella sequenza e per non mostrarli tra gli input possibili)
                         distance.forEachIndexed { index, c ->
                             if (c.digitToInt() == 0) {
                                 guessedIndexes = guessedIndexes.plus(index)
