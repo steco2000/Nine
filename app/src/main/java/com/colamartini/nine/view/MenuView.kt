@@ -1,25 +1,38 @@
 package com.colamartini.nine.view
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.colamartini.nine.R
 import com.colamartini.nine.navigation.Screen
-import com.colamartini.nine.ui.theme.*
+import com.colamartini.nine.ui.theme.menuItemsMargin
+import com.colamartini.nine.ui.theme.menuLogoSize
+import com.colamartini.nine.ui.theme.menuLogoTopMargin
 import com.colamartini.nine.widgets.LogoView
 import com.colamartini.nine.widgets.StyledButton
+
 
 //schermata del menu
 
 @Composable
 fun MenuView(navController: NavController){
 
-    //alla pressione del tasto back si rimane nel menu
-    BackHandler(enabled = true, onBack = { navController.navigate("menu_view") })
+    val context = LocalContext.current
+
+    //alla pressione del tasto back si chiude l'app tornando alla home
+    BackHandler(enabled = true, onBack = {
+        val a = Intent(Intent.ACTION_MAIN)
+        a.addCategory(Intent.CATEGORY_HOME)
+        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(context, a, null)
+    })
 
     ConstraintLayout (
         modifier = Modifier
