@@ -91,6 +91,7 @@ fun ScoresView(navController: NavController, difficulty: Int) {
         Row(
             modifier = Modifier
                 .padding(generalPadding)
+                .height(internalLogoSize)
                 .fillMaxWidth()
                 .background(background)
                 .border(
