@@ -120,7 +120,7 @@ fun StyledButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifie
     Button(
         modifier = modifier
             .padding(generalPadding)
-            .width(100.dp)
+            .width(120.dp)
             .height(40.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = cells_background

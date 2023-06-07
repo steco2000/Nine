@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="generate_seq">Genera Sequenza</string>
+    <string name="restart">Riavvia</string>
+    <string name="cancel">Cancella</string>
+    <string name="confirm">Conferma</string>
+    <string name="warning">Attenzione!</string>
+    <string name="missing_symbols">La tua sequenza è incompleta!</string>
+    <string name="ok">OK</string>
+    <string name="elapsed_time">Tempo trascorso:</string>
+    <string name="attempts">Tentativi</string>
+    <string name="seq_chronology">Sequenze precedenti</string>
+    <string name="play">Gioca</string>
+    <string name="scores">Punteggi</string>
+    <string name="select_difficulty">Seleziona una difficoltà</string>
+    <string name="easy">Facile</string>
+    <string name="medium">Media</string>
+    <string name="hard">Difficile</string>
+    <string name="game_lost">Hai Perso!</string>
+    <string name="game_lost_dialog_text">Hai esaurito i tentativi!</string>
+    <string name="game_won_title">Hai Vinto!</string>
+    <string name="game_won_basic_text">Congratulazioni, hai indovinato la sequenza!</string>
+    <string name="time">Tempo:</string>
+    <string name="total_attempts">Tentativi totali:</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="quit_question">La partita è in corso, sei sicuro di voler uscire?</string>
+    <string name="best_game">Record</string>
+    <string name="never_won_game">Non hai mai vinto una partita con questa difficoltà!</string>
+</resources>
