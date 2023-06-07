@@ -8,7 +8,7 @@
     <string name="missing_symbols">La tua sequenza è incompleta!</string>
     <string name="ok">OK</string>
     <string name="elapsed_time">Tempo trascorso:</string>
-    <string name="attempts">Tentativi</string>
+    <string name="attempts">Tentativi:</string>
     <string name="seq_chronology">Sequenze precedenti</string>
     <string name="play">Gioca</string>
     <string name="scores">Punteggi</string>
