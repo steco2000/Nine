@@ -32,4 +32,8 @@
     <string name="quit_question">Your game is on, are you sure you want to quit?</string>
     <string name="best_game">Record</string>
     <string name="never_won_game">You have never won a game on this difficulty!</string>
+    <string name="wins">Wins:</string>
+    <string name="games_played">Games played:</string>
+    <string name="losses">Losses:</string>
+    <string name="ratio">W/L Ratio:</string>
 </resources>

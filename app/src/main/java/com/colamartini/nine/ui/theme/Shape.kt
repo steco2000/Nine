@@ -20,5 +20,6 @@ val internalLogoSize = 100.dp
 val menuLogoTopMargin = 50.dp
 val menuLogoSize = 200.dp
 val menuItemsMargin = 40.dp
+val generalScoresBoxWidth = 155.dp
 const val halfWeight = 0.5f
 const val fullWeight = 1f

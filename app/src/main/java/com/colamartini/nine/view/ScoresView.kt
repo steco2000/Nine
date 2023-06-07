@@ -43,7 +43,7 @@ fun ScoresView(navController: NavController, difficulty: Int) {
 
     //alla pressione del tasto back si naviga semplicemente verso il menu
     BackHandler(enabled = true, onBack = { navController.navigate("menu_view") })
-    
+
     //istanziazione controller del db
     if (persistenceController == null) {
         persistenceController = GamePersistenceController(LocalContext.current)
@@ -65,6 +65,19 @@ fun ScoresView(navController: NavController, difficulty: Int) {
         bgJob.join()
     }
 
+    var victories = 0
+    var losses = 0
+
+    if (!gamesList!!.isEmpty()) {
+        gamesList!!.forEach {
+            if (it.win) victories++
+            else losses++
+        }
+    }
+
+    var ratio = 0F
+    if (losses != 0) ratio = victories.toFloat() / losses
+
     //colonna generale
     Column(
         modifier = Modifier
@@ -83,10 +96,28 @@ fun ScoresView(navController: NavController, difficulty: Int) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             LogoView(size = internalLogoSize)
-            Text(text = stringResource(id = R.string.scores), color = background_text)
+            Column(modifier = Modifier
+                .border(borderSize,background_text)
+                .padding(cornerDpShape)
+                .width(generalScoresBoxWidth)
+            ){
+                Text(
+                    text = stringResource(R.string.games_played) + " " + "${gamesList!!.size}",
+                    color = background_text
+                )
+                Text(
+                    text = stringResource(R.string.wins) + " " + "$victories",
+                    color = background_text
+                )
+                Text(
+                    text = stringResource(R.string.losses) + " " + "$losses",
+                    color = background_text
+                )
+                Text(text = stringResource(R.string.ratio) + " " + "%.2f".format(ratio), color = background_text)
+            }
         }
 
-        
+
         //riga del record
         Row(
             modifier = Modifier
@@ -155,28 +186,28 @@ fun ScoresView(navController: NavController, difficulty: Int) {
                     }
 
                     //se non esiste nemmeno una partita vinta per la difficoltà corrente si informa l'utente
-                }else Text(text = stringResource(R.string.never_won_game), color = background_text)
+                } else Text(text = stringResource(R.string.never_won_game), color = background_text)
             }
         }
-        
+
         /*
         colonna delle partite, se una partita è stata vinta viene racchiusa da un bordo verde, altrimenti rosso
          */
-        LazyColumn(modifier = Modifier
-            .padding(generalPadding)
-            .weight(fullWeight)
-            .fillMaxWidth()
-            .border(borderSize, cells_background)
-            .background(background)
+        LazyColumn(
+            modifier = Modifier
+                .padding(generalPadding)
+                .weight(fullWeight)
+                .fillMaxWidth()
+                .background(background)
         ) {
 
             //spacer per creare un leggero padding tra il primo item e il bordo della lazycolumn
-            item{
+            item {
                 Spacer(modifier = Modifier.size(generalPadding))
             }
 
             //per ogni partita si costruisce la riga contenente data, ora, tempo e tentativi
-            gamesList?.forEach {
+            gamesList!!.forEach {
                 item {
                     Row(
                         modifier = Modifier
@@ -229,23 +260,26 @@ fun ScoresView(navController: NavController, difficulty: Int) {
         }
 
         //barra di navigazione delle difficoltà. Quando cambiamo lo stato della barra si ricarica la schermata col valore corrispondente di difficoltà
-        BottomNavigation (
+        BottomNavigation(
             modifier = Modifier
                 .padding(generalPadding),
             backgroundColor = background
-        ){
+        ) {
             BottomNavigationItem(
                 modifier = Modifier
                     .border(borderSize, cells_background)
                     .background(if (difficulty == 0) cells_background else background),
                 selected = difficulty == 0,
                 onClick = {
-                    if(difficulty != 0){
+                    if (difficulty != 0) {
                         navController.navigate(Screen.ScoresView.withArgs("0"))
                     }
                 },
                 icon = {
-                    Text(text = stringResource(id = R.string.easy), color = if(difficulty == 0) background else cells_background)
+                    Text(
+                        text = stringResource(id = R.string.easy),
+                        color = if (difficulty == 0) background else cells_background
+                    )
                 }
             )
             BottomNavigationItem(
@@ -254,12 +288,15 @@ fun ScoresView(navController: NavController, difficulty: Int) {
                     .background(if (difficulty == 1) cells_background else background),
                 selected = difficulty == 1,
                 onClick = {
-                    if(difficulty != 1){
+                    if (difficulty != 1) {
                         navController.navigate(Screen.ScoresView.withArgs("1"))
                     }
                 },
                 icon = {
-                    Text(text = stringResource(id = R.string.medium), color = if(difficulty == 1) background else cells_background)
+                    Text(
+                        text = stringResource(id = R.string.medium),
+                        color = if (difficulty == 1) background else cells_background
+                    )
                 }
             )
             BottomNavigationItem(
@@ -268,12 +305,15 @@ fun ScoresView(navController: NavController, difficulty: Int) {
                     .background(if (difficulty == 2) cells_background else background),
                 selected = difficulty == 2,
                 onClick = {
-                    if(difficulty != 2){
+                    if (difficulty != 2) {
                         navController.navigate(Screen.ScoresView.withArgs("2"))
                     }
                 },
                 icon = {
-                    Text(text = stringResource(id = R.string.hard), color = if(difficulty == 2) background else cells_background)
+                    Text(
+                        text = stringResource(id = R.string.hard),
+                        color = if (difficulty == 2) background else cells_background
+                    )
                 }
             )
         }

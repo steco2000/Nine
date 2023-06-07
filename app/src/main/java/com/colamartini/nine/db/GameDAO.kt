@@ -20,13 +20,13 @@ interface GameDAO {
     @Query("select * from Game where time = (select Min(time) from Game where win = 1 and difficulty = 2) and difficulty = 2")
     fun getHardBestTime(): Game?
 
-    @Query("select * from Game where difficulty = 0")
+    @Query("select * from Game where difficulty = 0 order by id DESC")
     fun getEasyGames(): List<Game>
 
-    @Query("select * from Game where difficulty = 1")
+    @Query("select * from Game where difficulty = 1 order by id DESC")
     fun getMediumGames(): List<Game>
 
-    @Query("select * from Game where difficulty = 2")
+    @Query("select * from Game where difficulty = 2 order by id DESC")
     fun getHardGames(): List<Game>
 
 }

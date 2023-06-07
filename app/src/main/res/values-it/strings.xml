@@ -26,5 +26,9 @@
     <string name="no">No</string>
     <string name="quit_question">La partita è in corso, sei sicuro di voler uscire?</string>
     <string name="best_game">Record</string>
-    <string name="never_won_game">Non hai mai vinto una partita con questa difficoltà!</string>
+    <string name="never_won_game">Non hai mai vinto con questa difficoltà!</string>
+    <string name="wins">Vittorie:</string>
+    <string name="games_played">Partite giocate:</string>
+    <string name="losses">Sconfitte:</string>
+    <string name="ratio">Rateo V/S:</string>
 </resources>
