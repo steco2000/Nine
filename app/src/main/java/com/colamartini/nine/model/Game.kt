@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+//entity che rappresenta tutti i dati da mantenere in persistenza per le partite effettuate dall'utente
+
 @Entity(tableName = "Game")
 data class Game(
     @PrimaryKey(autoGenerate = true)

@@ -18,11 +18,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NineTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = background
                 ) {
+                    //all'avvio dell'activity viene subito chiamata la navigation che, attraverso il navHost, caricherà la schermata home
                     Navigation()
                 }
             }

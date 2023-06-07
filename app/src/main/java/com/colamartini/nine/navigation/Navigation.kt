@@ -11,6 +11,10 @@ import com.colamartini.nine.view.InGameView
 import com.colamartini.nine.view.MenuView
 import com.colamartini.nine.view.ScoresView
 
+/*
+composable che gestisce la navigazione tra le schermate
+ */
+
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
@@ -21,6 +25,7 @@ fun Navigation(){
         composable(route = Screen.DifficultyView.route){
             DifficultyView(navController)
         }
+        //la schermata del gioco e quella dei punteggi hanno bisogno della difficoltà per essere caricate, che va quindi passata nella route
         composable(
             route = Screen.InGameView.route + "/{difficulty}",
             arguments = listOf(

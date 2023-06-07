@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.colamartini.nine.model.Game
 
+//database singleton room
+
 @Database(entities = [Game::class], version = 1)
 abstract class GameDB: RoomDatabase() {
     companion object{
@@ -19,7 +21,7 @@ abstract class GameDB: RoomDatabase() {
                     GameDB::class.java,
                     "nine_db"
                 )
-                    .build()
+                    .build()    //in questo caso non è necessario costruire il db da asset, dato che non si devono precaricare dati
             }
             return db as GameDB
         }

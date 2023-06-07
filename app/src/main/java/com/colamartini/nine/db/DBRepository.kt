@@ -5,6 +5,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+//repository del db. Incapsula tutte le operazioni eseguibili con il dao
+
 class DBRepository(private val dao: GameDAO) {
 
     fun insertGame(game: Game){

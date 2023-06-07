@@ -55,7 +55,7 @@ fun ScoresView(navController: NavController, difficulty: Int) {
     var bestGame: GameBean? = null
     var gamesList: List<GameBean>? = null
 
-    //attraverso un thread recuperiamo i dati dal db, attendendo i risultati prima di costruire l'interfaccia
+    //attraverso un thread si recuperano i dati dal db, attendendo i risultati prima di costruire l'interfaccia
     val bgJob = CoroutineScope(Dispatchers.IO).launch {
         bestGame = persistenceController!!.getBestTime(difficulty)
         gamesList = persistenceController!!.getGamesByDifficulty(difficulty)
@@ -65,6 +65,8 @@ fun ScoresView(navController: NavController, difficulty: Int) {
         bgJob.join()
     }
 
+
+    //dai dati ottenuti si calcolano il numero di vittorie e sconfitte e il rateo
     var victories = 0
     var losses = 0
 
@@ -86,7 +88,7 @@ fun ScoresView(navController: NavController, difficulty: Int) {
             .background(background)
     ) {
 
-        //header della schermata
+        //header della schermata + informazioni generali
         Row(
             modifier = Modifier
                 .padding(generalPadding)

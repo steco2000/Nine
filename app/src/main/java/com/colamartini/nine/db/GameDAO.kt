@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.colamartini.nine.model.Game
 
+//DAO del db, contiene tutte le operazioni necessarie per salvataggio e recupero dei dati necessari all'utente
+
 @Dao
 interface GameDAO {
 
@@ -20,7 +22,7 @@ interface GameDAO {
     @Query("select * from Game where time = (select Min(time) from Game where win = 1 and difficulty = 2) and difficulty = 2")
     fun getHardBestTime(): Game?
 
-    @Query("select * from Game where difficulty = 0 order by id DESC")
+    @Query("select * from Game where difficulty = 0 order by id DESC")  //ordinando i risultati per id decrescente appariranno per prime le partite più recenti
     fun getEasyGames(): List<Game>
 
     @Query("select * from Game where difficulty = 1 order by id DESC")
