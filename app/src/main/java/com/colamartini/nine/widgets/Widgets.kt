@@ -14,10 +14,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.colamartini.nine.R
 import com.colamartini.nine.ui.theme.*
 
+//libreria di widget vari per l'interfaccia
+
+
+/*
+barra utilizzata per mostrare la sequenza appena passata in input dall'utente. In ingresso, oltre alla sequenza, vengono passati gli
+indici delle casella da nascondere (ad esempio se un carattere è stato indovinato) e il booleano blurred se vogliamo mostrare le caselle
+"sfocate" (come nella lazycolumn delle sequenze inserite precedentemente)
+ */
 @Composable
 fun InputBar(sequence: String, hideIndexes: List<Int>, blurred: Boolean) {
     Row(
@@ -51,6 +58,11 @@ fun InputBar(sequence: String, hideIndexes: List<Int>, blurred: Boolean) {
 
 }
 
+
+/*
+barra della sequenza. Simile alla barra dell'input, solo che in questo caso vengono passati gli indici dei simboli indovinati. In questo
+modo se una determinata casella corrisponde ad un simbolo già indovinato viene colorata di verde, altrimenti di rosso
+ */
 @Composable
 fun SequenceBar(text: String, guessedIndexes: List<Int>) {
     var borderColor: Color
@@ -81,6 +93,8 @@ fun SequenceBar(text: String, guessedIndexes: List<Int>) {
     }
 }
 
+
+//la barra della distanza è simile alle altre due ma prende in input solo il testo
 @Composable
 fun DistanceBar(text: String) {
     Row(
@@ -105,6 +119,8 @@ fun DistanceBar(text: String) {
     }
 }
 
+
+//composable per mostrare il logo dell'app, passando una certa size in dp e eventualmente un modifier
 @Composable
 fun LogoView(size: Dp, modifier: Modifier = Modifier) {
     Image(
@@ -115,22 +131,29 @@ fun LogoView(size: Dp, modifier: Modifier = Modifier) {
     )
 }
 
+
+//bottone standard usato in tutta l'applicazione
 @Composable
 fun StyledButton(onClick: () -> Unit, text: String, modifier: Modifier = Modifier) {
     Button(
         modifier = modifier
             .padding(generalPadding)
-            .width(120.dp)
-            .height(40.dp),
+            .width(buttonWidth)
+            .height(buttonHeight),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = cells_background
         ),
         onClick = { onClick() }
     ) {
-        Text(text = text, color = black)
+        Text(text = text, color = background)
     }
 }
 
+
+/*
+alert dialog per mostrare semplici messaggi all'utente. È presente solo il tasto "OK" con la possibilità di passare una unit da eseguire
+alla pressione
+ */
 @Composable
 fun GeneralInfoAlertDialog(title: String, text: String, onDismissRequest: () -> Unit) {
     AlertDialog(
@@ -151,12 +174,19 @@ fun GeneralInfoAlertDialog(title: String, text: String, onDismissRequest: () -> 
         })
 }
 
+/*
+alert dialog per fare una domanda all'utente o per fornire due opzioni quando viene mostrato. È possibile passare due unit, una
+per la conferma e una per il dismiss. Di default i due tasti saranno "Si" e "No", eventualmente però c'è la possibilità di
+passare un testo alternativo
+ */
 @Composable
 fun QuestionAlertDialog(
     title: String,
     text: String,
     onDismissRequest: () -> Unit,
-    onAcceptRequest: () -> Unit
+    onAcceptRequest: () -> Unit,
+    confirmButtonText: String = stringResource(id = R.string.yes),
+    dismissButtonText: String = stringResource(id = R.string.no)
 ) {
     AlertDialog(
         backgroundColor = background,
@@ -173,7 +203,7 @@ fun QuestionAlertDialog(
                 onClick = {
                     onAcceptRequest()
                 },
-                text = stringResource(R.string.yes)
+                text = confirmButtonText
             )
         },
         dismissButton = {
@@ -181,7 +211,7 @@ fun QuestionAlertDialog(
                 onClick = {
                     onDismissRequest()
                 },
-                text = stringResource(R.string.no)
+                text = dismissButtonText
             )
         })
 }

@@ -150,12 +150,18 @@ fun InGameView(difficulty: Int, navController: NavController) {
         }
 
         timerIsRunning = false
-        GeneralInfoAlertDialog(
+        QuestionAlertDialog(
             title = stringResource(id = R.string.game_lost),
-            text = stringResource(id = R.string.game_lost_dialog_text)
-        ) {
-            navController.navigate(Screen.InGameView.withArgs("$difficulty"))
-        }
+            text = stringResource(id = R.string.game_lost_dialog_text),
+            onAcceptRequest = {
+                navController.navigate("menu_view")
+            },
+            onDismissRequest = {
+                navController.navigate(Screen.InGameView.withArgs("$difficulty"))
+            },
+            confirmButtonText = stringResource(R.string.back_to_menu),
+            dismissButtonText = stringResource(R.string.new_game)
+        )
 
     } else if (controller.isGuessed()) {
 
@@ -173,17 +179,23 @@ fun InGameView(difficulty: Int, navController: NavController) {
         }
 
         timerIsRunning = false
-        GeneralInfoAlertDialog(
+        QuestionAlertDialog(
             title = stringResource(id = R.string.game_won_title),
             text = stringResource(id = R.string.game_won_basic_text) + "\n"
                     + "\n"
                     + stringResource(R.string.time) + " " + minutes.toZeroTrailedString() + ":" + seconds.toZeroTrailedString() + "." + "%02d".format(
                 centSeconds / 10
             ) + "\n"
-                    + stringResource(R.string.total_attempts) + " " + attempts
-        ) {
-            navController.navigate(Screen.InGameView.withArgs("$difficulty"))
-        }
+                    + stringResource(R.string.total_attempts) + " " + attempts,
+            onAcceptRequest = {
+                navController.navigate("menu_view")
+            },
+            onDismissRequest = {
+                navController.navigate(Screen.InGameView.withArgs("$difficulty"))
+            },
+            confirmButtonText = stringResource(R.string.back_to_menu),
+            dismissButtonText = stringResource(R.string.new_game)
+        )
     }
 
     //colonna generale

@@ -31,4 +31,6 @@
     <string name="games_played">Partite giocate:</string>
     <string name="losses">Sconfitte:</string>
     <string name="ratio">Rateo V/S:</string>
+    <string name="back_to_menu">Esci</string>
+    <string name="new_game">Riavvia</string>
 </resources>

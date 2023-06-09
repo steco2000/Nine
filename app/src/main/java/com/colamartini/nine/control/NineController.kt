@@ -42,7 +42,8 @@ class NineController {
     fun gameIsLost(): Boolean { return gameLost }
 
     /*
-    il seguente metodo calcola la distanza tra i simboli inseriti dall'utente e la sequenza estratta, controllando se la sequenza è stata indovinata o se la partita è persa
+    il seguente metodo calcola la distanza tra i simboli inseriti dall'utente e la sequenza estratta,
+    controllando se la sequenza è stata indovinata o se la partita è persa
      */
     fun calculateDistance(sequence: String, userInput: String): String{
         var distance = ""
@@ -51,6 +52,11 @@ class NineController {
 
         attempts++
 
+        /*
+        per ogni simbolo dell'input si tiene da parte l'indice e si cerca linearmente l'equivalente nella sequenza dell'app.
+        Quando viene trovato, si salva l'indice di quello della sequenza, e si effettua la differeza tra questo e l'indice del simbolo
+        nell'input. Fatto ciò si prende il valore assoluto della differenza
+        */
         userInput.forEachIndexed {idxIn ,inChar ->
             sequence.forEachIndexed{ i, seqChar ->
                 if(seqChar == inChar){
@@ -61,9 +67,16 @@ class NineController {
 
             absDistance = kotlin.math.abs((charIndex - idxIn))
 
+            /*
+            se il valore assoluto è <= 4 vuol dire che quella che abbiamo trovato è la distanza minima, quindi si può aggiungere
+            all'array delle distanze che verrà poi mostrato all'utente. Se invece la distanza trovata è almeno 5 significa che non è
+            minima (dato che la sequenza è lunga 9 caratteri). Per trovare la minima basta quindi sottrarre quella trovata alla
+            lunghezza della sequenza
+             */
             distance += if(absDistance <= 4) "$absDistance" else "${sequence.length - absDistance}"
         }
 
+        //in base all'array ottenuto si controlla se la partita è vinta o persa
         if(distance == "000000000") sequenceIsGuessed = true
         gameLost = attempts >= maxAttempts && !sequenceIsGuessed
 

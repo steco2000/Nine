@@ -36,4 +36,6 @@
     <string name="games_played">Games played:</string>
     <string name="losses">Losses:</string>
     <string name="ratio">W/L Ratio:</string>
+    <string name="back_to_menu">Quit</string>
+    <string name="new_game">New game</string>
 </resources>
